@@ -1,0 +1,15 @@
+.DS_Store
+.idea/
+.vscode/
+*.iml
+target/
+**/target/
+*.log
+.env
+.env.*
+!.env.example
+data/
+*.jfr
+dependency-reduced-pom.xml
+docs/images/generated/
+.cache/

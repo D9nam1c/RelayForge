@@ -1,0 +1,49 @@
+server:
+  port: 8084
+spring:
+  application:
+    name: delivery-worker
+  config:
+    import: optional:configserver:${CONFIG_SERVER_URL:http://config-server:8888}
+  datasource:
+    url: ${WORKER_DB_URL:jdbc:postgresql://postgres:5432/relayforge_worker}
+    username: ${DB_USER:relayforge}
+    password: ${DB_PASSWORD}
+  data:
+    redis:
+      host: ${REDIS_HOST:redis}
+  cloud:
+    function:
+      definition: attemptCommands
+    stream:
+      bindings:
+        attemptCommands-in-0:
+          destination: relayforge.attempt.commands.v1
+          group: relayforge-workers-v1
+          consumer:
+            max-attempts: 1
+        attempt-results-out-0:
+          destination: relayforge.attempt.results.v1
+      kafka:
+        binder:
+          brokers: ${KAFKA_BROKERS:kafka:9092}
+        bindings:
+          attemptCommands-in-0:
+            consumer:
+              enable-dlq: true
+              dlq-name: relayforge.attempt.commands.dlq.v1
+relayforge:
+  secrets:
+    master-key: ${RELAYFORGE_MASTER_KEY}
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_URL:http://discovery-server:8761/eureka/}
+resilience4j:
+  circuitbreaker:
+    configs:
+      default:
+        sliding-window-size: 10
+        minimum-number-of-calls: 5
+        failure-rate-threshold: 60
+        wait-duration-in-open-state: 10s

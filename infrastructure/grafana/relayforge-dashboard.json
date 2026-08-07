@@ -1,0 +1,71 @@
+{
+  "annotations": {"list": []},
+  "editable": false,
+  "graphTooltip": 1,
+  "links": [],
+  "panels": [
+    {
+      "type": "stat", "title": "Accepted events (5m)", "id": 1,
+      "gridPos": {"h": 5, "w": 6, "x": 0, "y": 0},
+      "datasource": {"type": "prometheus", "uid": "prometheus"},
+      "targets": [{"expr": "sum(increase(relayforge_events_accepted_total[5m]))", "refId": "A"}]
+    },
+    {
+      "type": "stat", "title": "Idempotency hits (5m)", "id": 2,
+      "gridPos": {"h": 5, "w": 6, "x": 6, "y": 0},
+      "datasource": {"type": "prometheus", "uid": "prometheus"},
+      "targets": [{"expr": "sum(increase(relayforge_events_idempotency_hits_total[5m]))", "refId": "A"}]
+    },
+    {
+      "type": "stat", "title": "Lease recoveries (15m)", "id": 3,
+      "gridPos": {"h": 5, "w": 6, "x": 12, "y": 0},
+      "datasource": {"type": "prometheus", "uid": "prometheus"},
+      "targets": [{"expr": "sum(increase(relayforge_delivery_lease_recovered_total[15m]))", "refId": "A"}]
+    },
+    {
+      "type": "stat", "title": "Replays (15m)", "id": 4,
+      "gridPos": {"h": 5, "w": 6, "x": 18, "y": 0},
+      "datasource": {"type": "prometheus", "uid": "prometheus"},
+      "targets": [{"expr": "sum(increase(relayforge_delivery_replays_total[15m]))", "refId": "A"}]
+    },
+    {
+      "type": "timeseries", "title": "Attempt outcomes", "id": 5,
+      "gridPos": {"h": 9, "w": 12, "x": 0, "y": 5},
+      "datasource": {"type": "prometheus", "uid": "prometheus"},
+      "targets": [{"expr": "sum by (outcome) (rate(relayforge_worker_attempts_total[5m]))", "legendFormat": "{{outcome}}", "refId": "A"}]
+    },
+    {
+      "type": "timeseries", "title": "Retry reasons", "id": 6,
+      "gridPos": {"h": 9, "w": 12, "x": 12, "y": 5},
+      "datasource": {"type": "prometheus", "uid": "prometheus"},
+      "targets": [{"expr": "sum by (reason) (rate(relayforge_delivery_retries_total[5m]))", "legendFormat": "{{reason}}", "refId": "A"}]
+    },
+    {
+      "type": "timeseries", "title": "Scheduler and outbox throughput", "id": 7,
+      "gridPos": {"h": 9, "w": 12, "x": 0, "y": 14},
+      "datasource": {"type": "prometheus", "uid": "prometheus"},
+      "targets": [
+        {"expr": "sum(rate(relayforge_scheduling_claimed_total[5m]))", "legendFormat": "claimed", "refId": "A"},
+        {"expr": "sum(rate(relayforge_attempt_outbox_published_total[5m]))", "legendFormat": "commands", "refId": "B"},
+        {"expr": "sum(rate(relayforge_worker_results_published_total[5m]))", "legendFormat": "results", "refId": "C"}
+      ]
+    },
+    {
+      "type": "timeseries", "title": "Endpoint pressure", "id": 8,
+      "gridPos": {"h": 9, "w": 12, "x": 12, "y": 14},
+      "datasource": {"type": "prometheus", "uid": "prometheus"},
+      "targets": [
+        {"expr": "sum(rate(relayforge_worker_attempts_total{outcome=\"endpoint_saturated\"}[5m]))", "legendFormat": "saturated", "refId": "A"},
+        {"expr": "sum(rate(relayforge_scheduling_paused_total[5m]))", "legendFormat": "scheduler paused", "refId": "B"}
+      ]
+    }
+  ],
+  "refresh": "10s",
+  "schemaVersion": 41,
+  "tags": ["relayforge", "webhooks"],
+  "templating": {"list": []},
+  "time": {"from": "now-1h", "to": "now"},
+  "title": "RelayForge Delivery Operations",
+  "uid": "relayforge-delivery",
+  "version": 1
+}

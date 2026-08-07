@@ -1,0 +1,68 @@
+server:
+  port: 8083
+spring:
+  application:
+    name: dispatch-service
+  config:
+    import: optional:configserver:${CONFIG_SERVER_URL:http://config-server:8888}
+  datasource:
+    url: ${DISPATCH_DB_URL:jdbc:postgresql://postgres:5432/relayforge_dispatch}
+    username: ${DB_USER:relayforge}
+    password: ${DB_PASSWORD}
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${OIDC_ISSUER:http://keycloak:8080/realms/relayforge}
+  cloud:
+    function:
+      definition: acceptedEvents;attemptResults
+    stream:
+      bindings:
+        acceptedEvents-in-0:
+          destination: relayforge.events.accepted.v1
+          group: relayforge-dispatch-v1
+          consumer:
+            max-attempts: 1
+        attemptResults-in-0:
+          destination: relayforge.attempt.results.v1
+          group: relayforge-dispatch-results-v1
+          consumer:
+            max-attempts: 1
+        attempt-commands-out-0:
+          destination: relayforge.attempt.commands.v1
+      kafka:
+        binder:
+          brokers: ${KAFKA_BROKERS:kafka:9092}
+        bindings:
+          acceptedEvents-in-0:
+            consumer:
+              enable-dlq: true
+              dlq-name: relayforge.events.accepted.dlq.v1
+          attemptResults-in-0:
+            consumer:
+              enable-dlq: true
+              dlq-name: relayforge.attempt.results.dlq.v1
+  openfeign:
+    circuitbreaker:
+      enabled: true
+    client:
+      config:
+        control-plane-service:
+          connectTimeout: 1000
+          readTimeout: 2000
+relayforge:
+  internal:
+    token: ${INTERNAL_TOKEN}
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_URL:http://discovery-server:8761/eureka/}
+resilience4j:
+  circuitbreaker:
+    instances:
+      control-plane-service:
+        sliding-window-size: 20
+        minimum-number-of-calls: 5
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 5s

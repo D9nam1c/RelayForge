@@ -1,0 +1,36 @@
+server:
+  port: 8082
+spring:
+  application:
+    name: ingest-service
+  config:
+    import: optional:configserver:${CONFIG_SERVER_URL:http://config-server:8888}
+  datasource:
+    url: ${INGEST_DB_URL:jdbc:postgresql://postgres:5432/relayforge_ingest}
+    username: ${DB_USER:relayforge}
+    password: ${DB_PASSWORD}
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${OIDC_ISSUER:http://keycloak:8080/realms/relayforge}
+  cloud:
+    stream:
+      bindings:
+        accepted-events-out-0:
+          destination: relayforge.events.accepted.v1
+          producer:
+            partition-key-expression: headers['kafka_messageKey']
+      kafka:
+        binder:
+          brokers: ${KAFKA_BROKERS:kafka:9092}
+        bindings:
+          accepted-events-out-0:
+            producer:
+              configuration:
+                enable.idempotence: true
+                acks: all
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_URL:http://discovery-server:8761/eureka/}

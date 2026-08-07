@@ -1,0 +1,15 @@
+description: Dispatch resolves a tenant's event subscriptions through the narrow internal boundary
+name: matchingSubscriptions
+request:
+  method: GET
+  urlPath: /internal/v1/subscriptions/matches
+  queryParameters:
+    tenantId: "11111111-1111-1111-1111-111111111111"
+    eventType: invoice.paid
+  headers:
+    X-RelayForge-Internal-Token: contract-test-token
+response:
+  status: 200
+  headers:
+    Content-Type: application/json
+  body: []

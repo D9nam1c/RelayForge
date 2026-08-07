@@ -1,0 +1,25 @@
+server:
+  port: 8081
+spring:
+  application:
+    name: control-plane-service
+  config:
+    import: optional:configserver:${CONFIG_SERVER_URL:http://config-server:8888}
+  datasource:
+    url: ${CONTROL_DB_URL:jdbc:postgresql://postgres:5432/relayforge_control}
+    username: ${DB_USER:relayforge}
+    password: ${DB_PASSWORD}
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${OIDC_ISSUER:http://keycloak:8080/realms/relayforge}
+relayforge:
+  secrets:
+    master-key: ${RELAYFORGE_MASTER_KEY}
+  internal:
+    token: ${INTERNAL_TOKEN}
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_URL:http://discovery-server:8761/eureka/}

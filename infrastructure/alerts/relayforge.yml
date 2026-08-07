@@ -1,0 +1,27 @@
+groups:
+  - name: relayforge-delivery
+    rules:
+      - alert: RelayForgeDeadLetterSpike
+        expr: sum(increase(relayforge_delivery_attempts_total{outcome!="succeeded"}[10m])) > 20
+        for: 5m
+        labels: {severity: warning}
+        annotations:
+          summary: Delivery failures are spiking
+      - alert: RelayForgeOutboxStall
+        expr: max(relayforge_attempt_outbox_unpublished) > 0 and sum(rate(relayforge_attempt_outbox_published_total[5m])) == 0
+        for: 10m
+        labels: {severity: critical}
+        annotations:
+          summary: An outbox contains work but is not publishing
+      - alert: RelayForgeWorkerPressure
+        expr: sum(rate(relayforge_worker_attempts_total{outcome="endpoint_saturated"}[5m])) > 1
+        for: 5m
+        labels: {severity: warning}
+        annotations:
+          summary: Endpoint concurrency saturation is elevated
+      - alert: RelayForgeQueueAgeHigh
+        expr: relayforge_delivery_queue_oldest_seconds > 30
+        for: 10m
+        labels: {severity: critical}
+        annotations:
+          summary: Oldest due delivery exceeds the demo SLO

@@ -1,0 +1,15 @@
+package io.relayforge.contracts;
+
+public enum AttemptOutcome {
+    SUCCEEDED,
+    RATE_LIMITED,
+    RETRYABLE_HTTP,
+    PERMANENT_HTTP,
+    TIMEOUT,
+    CONNECTION_FAILURE,
+    RESPONSE_TOO_LARGE,
+    ENDPOINT_SATURATED,
+    BLOCKED_TARGET,
+    LEASE_EXPIRED,
+    INTERNAL_FAILURE
+}

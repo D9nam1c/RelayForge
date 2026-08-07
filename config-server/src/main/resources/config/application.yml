@@ -1,0 +1,51 @@
+relayforge:
+  payload:
+    max-bytes: 262144
+    retention: P30D
+  retry:
+    max-attempts: 10
+    initial-delay: PT2S
+    max-delay: PT15M
+    max-retry-after: PT15M
+  scheduling:
+    batch-size: 100
+    per-tenant-batch: 10
+    lease-duration: PT45S
+    pause-outbox-backlog: 10000
+  quotas:
+    producer-events-per-second: 50
+    tenant-in-flight: 100
+  outbound:
+    allowed-ports: 443
+    connect-timeout: PT3S
+    request-timeout: PT10S
+    max-response-bytes: 65536
+  secrets:
+    rotation-overlap: PT15M
+  features:
+    replay-enabled: true
+    development-sink-exception: false
+management:
+  tracing:
+    sampling:
+      probability: 1.0
+  otlp:
+    tracing:
+      endpoint: ${OTEL_EXPORTER_OTLP_ENDPOINT:http://tempo:4318/v1/traces}
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus
+  endpoint:
+    health:
+      probes:
+        enabled: true
+server:
+  shutdown: graceful
+spring:
+  lifecycle:
+    timeout-per-shutdown-phase: 30s
+logging:
+  structured:
+    format:
+      console: ecs

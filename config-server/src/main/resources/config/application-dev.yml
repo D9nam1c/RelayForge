@@ -1,0 +1,9 @@
+relayforge:
+  features:
+    development-sink-exception: true
+  outbound:
+    allowed-ports: 443,8090
+management:
+  tracing:
+    sampling:
+      probability: 1.0

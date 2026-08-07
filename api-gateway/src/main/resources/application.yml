@@ -1,0 +1,64 @@
+server:
+  port: 8080
+  max-http-request-header-size: 16KB
+spring:
+  application:
+    name: api-gateway
+  config:
+    import: optional:configserver:${CONFIG_SERVER_URL:http://config-server:8888}
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${OIDC_ISSUER:http://keycloak:8080/realms/relayforge}
+  data:
+    redis:
+      host: ${REDIS_HOST:redis}
+  cloud:
+    gateway:
+      server:
+        webflux:
+          default-filters:
+            - name: RequestSize
+              args:
+                maxSize: 300KB
+          routes:
+            - id: control-plane
+              uri: lb://control-plane-service
+              predicates: [ Path=/v1/endpoints/**,/v1/subscriptions/**,/v1/audit/** ]
+              filters:
+                - name: RequestRateLimiter
+                  args:
+                    redis-rate-limiter.replenishRate: 20
+                    redis-rate-limiter.burstCapacity: 40
+                    redis-rate-limiter.requestedTokens: 1
+                    key-resolver: "#{@tenantKeyResolver}"
+            - id: ingest
+              uri: lb://ingest-service
+              predicates: [ Path=/v1/events/** ]
+              filters:
+                - name: RequestRateLimiter
+                  args:
+                    redis-rate-limiter.replenishRate: 50
+                    redis-rate-limiter.burstCapacity: 100
+                    redis-rate-limiter.requestedTokens: 1
+                    key-resolver: "#{@tenantKeyResolver}"
+            - id: dispatch
+              uri: lb://dispatch-service
+              predicates: [ Path=/v1/deliveries/** ]
+              filters:
+                - name: RequestRateLimiter
+                  args:
+                    redis-rate-limiter.replenishRate: 30
+                    redis-rate-limiter.burstCapacity: 60
+                    redis-rate-limiter.requestedTokens: 1
+                    key-resolver: "#{@tenantKeyResolver}"
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_URL:http://discovery-server:8761/eureka/}
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus
