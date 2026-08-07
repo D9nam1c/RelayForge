@@ -1,0 +1,21 @@
+name: Feature proposal
+description: Propose a bounded platform capability
+title: "[feature] "
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Operational problem
+      description: Describe the failure mode or user journey, not only a solution.
+    validations: {required: true}
+  - type: textarea
+    id: guarantees
+    attributes:
+      label: Required guarantees and non-guarantees
+    validations: {required: true}
+  - type: textarea
+    id: tenancy
+    attributes:
+      label: Tenant, security, and data-retention impact
+    validations: {required: true}

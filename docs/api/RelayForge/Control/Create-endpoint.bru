@@ -1,0 +1,42 @@
+meta {
+  name: Create endpoint
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{gateway}}/v1/endpoints
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{accessToken}}
+}
+
+body:json {
+  {
+    "name": "Bruno sink",
+    "url": "http://webhook-sink:8090/webhooks/bruno",
+    "subscriptions": [{"eventType": "invoice.paid", "filterJson": "{\"region\":\"us\"}"}],
+    "policy": {
+      "maxAttempts": 5,
+      "initialDelay": "PT1S",
+      "maxDelay": "PT1M",
+      "maxRetryAfter": "PT1M",
+      "endpointConcurrency": 1,
+      "preserveOrder": true
+    }
+  }
+}
+
+script:post-response {
+  bru.setEnvVar("endpointId", res.body.id);
+}
+
+tests {
+  test("secret appears in creation response", function() {
+    expect(res.status).to.equal(201);
+    expect(res.body.signingSecret).to.match(/^whsec_/);
+  });
+}

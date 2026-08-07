@@ -1,0 +1,28 @@
+name: Bug report
+description: Report a reproducible RelayForge defect without sensitive data
+title: "[bug] "
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: Never attach webhook payloads, access tokens, signing keys, or `.env`.
+  - type: textarea
+    id: behavior
+    attributes:
+      label: Observed behavior
+    validations: {required: true}
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations: {required: true}
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Minimal reproduction
+    validations: {required: true}
+  - type: input
+    id: commit
+    attributes:
+      label: Commit and environment
+    validations: {required: true}

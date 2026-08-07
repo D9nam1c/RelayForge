@@ -1,0 +1,34 @@
+meta {
+  name: Publish event
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{gateway}}/v1/events
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{producerToken}}
+}
+
+headers {
+  Idempotency-Key: bruno-invoice-1
+  Webhook-Event-Type: invoice.paid
+  Webhook-Source-Id: invoice-1
+  Webhook-Schema-Version: 1
+}
+
+body:json {
+  {"invoiceId":"invoice-1","region":"us","amount":4200}
+}
+
+script:post-response {
+  bru.setEnvVar("eventId", res.body.eventId);
+}
+
+tests {
+  test("durably accepted", function() { expect(res.status).to.equal(202); });
+}

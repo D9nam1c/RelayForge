@@ -1,0 +1,15 @@
+meta {
+  name: Get attempt timeline
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{gateway}}/v1/deliveries/{{deliveryId}}
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{accessToken}}
+}

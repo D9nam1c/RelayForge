@@ -1,0 +1,19 @@
+meta {
+  name: List deliveries for event
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{gateway}}/v1/deliveries?eventId={{eventId}}
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{accessToken}}
+}
+
+script:post-response {
+  if (res.body.length > 0) bru.setEnvVar("deliveryId", res.body[0].deliveryId);
+}

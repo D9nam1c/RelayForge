@@ -1,0 +1,22 @@
+meta {
+  name: Get Acme admin token
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{keycloak}}/realms/relayforge/protocol/openid-connect/token
+  body: formUrlEncoded
+  auth: none
+}
+
+body:form-urlencoded {
+  grant_type: password
+  client_id: relayforge-cli
+  username: acme-admin
+  password: {{acmeAdminPassword}}
+}
+
+script:post-response {
+  bru.setEnvVar("accessToken", res.body.access_token);
+}

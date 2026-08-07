@@ -1,0 +1,21 @@
+meta {
+  name: Get Acme producer token
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{keycloak}}/realms/relayforge/protocol/openid-connect/token
+  body: formUrlEncoded
+  auth: none
+}
+
+body:form-urlencoded {
+  grant_type: client_credentials
+  client_id: acme-producer
+  client_secret: {{acmeProducerSecret}}
+}
+
+script:post-response {
+  bru.setEnvVar("producerToken", res.body.access_token);
+}
