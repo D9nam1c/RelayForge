@@ -30,7 +30,7 @@ jobs:
         run: git diff --check
       - name: Compile, unit tests, PostgreSQL integration tests, package
         run: MAVEN_USER_HOME="$PWD/.cache/maven-home" ./mvnw --batch-mode --no-transfer-progress verify
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: test-reports
